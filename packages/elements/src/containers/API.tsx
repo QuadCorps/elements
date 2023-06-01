@@ -15,8 +15,8 @@ import { flow } from 'lodash';
 import * as React from 'react';
 import { useQuery } from 'react-query';
 
-import { APIWithSidebarLayout } from '../components/API/APIWithSidebarLayout';
 import { APIWithStackedLayout } from '../components/API/APIWithStackedLayout';
+import { AvivaLayout } from '../components/API/AvivaLayout';
 import { useExportDocumentProps } from '../hooks/useExportDocumentProps';
 import { transformOasToServiceNode } from '../utils/oas';
 
@@ -171,7 +171,7 @@ export const APIImpl: React.FC<APIProps> = props => {
           tryItCorsProxy={tryItCorsProxy}
         />
       ) : (
-        <APIWithSidebarLayout
+        <AvivaLayout
           logo={logo}
           serviceNode={serviceNode}
           hideTryIt={hideTryIt}

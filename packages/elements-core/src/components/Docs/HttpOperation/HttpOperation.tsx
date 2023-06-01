@@ -1,7 +1,8 @@
-import { Box, Flex, Heading, HStack, NodeAnnotation, useThemeIsDark, VStack } from '@stoplight/mosaic';
+import { Box, Flex, Heading, HStack, InvertTheme, NodeAnnotation, useThemeIsDark, VStack } from '@stoplight/mosaic';
 import { withErrorBoundary } from '@stoplight/react-error-boundary';
 import { IHttpOperation } from '@stoplight/types';
 import cn from 'classnames';
+import { Request as HarRequest } from 'har-format';
 import { useAtomValue } from 'jotai/utils';
 import * as React from 'react';
 
@@ -11,7 +12,9 @@ import { useResolvedObject } from '../../../context/InlineRefResolver';
 import { useOptionsCtx } from '../../../context/Options';
 import { useChosenServerUrl } from '../../../hooks/useChosenServerUrl';
 import { MarkdownViewer } from '../../MarkdownViewer';
-import { chosenServerAtom, TryItWithRequestSamples } from '../../TryIt';
+import { RequestSamples } from '../../RequestSamples';
+import { ResponseExamples } from '../../ResponseExamples/ResponseExamples';
+import { chosenServerAtom, TryIt } from '../../TryIt';
 import { DocsComponentProps } from '..';
 import { TwoColumnLayout } from '../TwoColumnLayout';
 import { DeprecatedBadge, InternalBadge } from './Badges';
@@ -35,7 +38,8 @@ const HttpOperationComponent = React.memo<HttpOperationProps>(
 
     const prettyName = (data.summary || data.iid || '').trim();
     const hasBadges = isDeprecated || isInternal;
-
+    const descriptionChanged = nodeHasChanged?.({ nodeId: data.id, attr: 'description' });
+    const [requestData, setRequestData] = React.useState<HarRequest | undefined>();
     const header = (
       <OperationHeader
         id={data.id}
@@ -49,48 +53,62 @@ const HttpOperationComponent = React.memo<HttpOperationProps>(
       />
     );
 
-    const descriptionChanged = nodeHasChanged?.({ nodeId: data.id, attr: 'description' });
-    const description = (
+    const requestObj = <Request onChange={setTextRequestBodyIndex} operation={data} />;
+    const tryItObj = (
+      <InvertTheme>
+        <Box>
+          <TryIt
+            httpOperation={data}
+            mockUrl={mocking.hideMocking ? undefined : mocking.mockUrl}
+            requestBodyIndex={requestBodyIndex}
+            embeddedInMd={false}
+            tryItCredentialsPolicy={tryItCredentialsPolicy}
+            corsProxy={tryItCorsProxy}
+            onRequestChange={setRequestData}
+          />
+        </Box>
+      </InvertTheme>
+    );
+    const responseExamplesObj = (
+      <ResponseExamples
+        httpOperation={data}
+        responseMediaType={responseMediaType}
+        responseStatusCode={responseStatusCode}
+      />
+    );
+
+    return (
       <VStack spacing={10}>
+        {header}
         {data.description && (
           <Box pos="relative">
             <MarkdownViewer className="HttpOperation__Description" markdown={data.description} />
             <NodeAnnotation change={descriptionChanged} />
           </Box>
         )}
+        <TwoColumnLayout
+          className={cn('HttpOperation', className)}
+          header={<></>}
+          left={tryItObj}
+          right={requestData && <RequestSamples request={requestData} />}
+        />
 
-        <Request onChange={setTextRequestBodyIndex} operation={data} />
-
-        {data.responses && (
-          <Responses
-            responses={data.responses}
-            onMediaTypeChange={setResponseMediaType}
-            onStatusCodeChange={setResponseStatusCode}
-          />
-        )}
+        {requestObj}
+        <TwoColumnLayout
+          className={cn('HttpOperation', className)}
+          header={<></>}
+          left={
+            data.responses && (
+              <Responses
+                responses={data.responses}
+                onMediaTypeChange={setResponseMediaType}
+                onStatusCodeChange={setResponseStatusCode}
+              />
+            )
+          }
+          right={responseExamplesObj}
+        />
       </VStack>
-    );
-
-    const tryItPanel = !layoutOptions?.hideTryItPanel && (
-      <TryItWithRequestSamples
-        httpOperation={data}
-        responseMediaType={responseMediaType}
-        responseStatusCode={responseStatusCode}
-        requestBodyIndex={requestBodyIndex}
-        hideTryIt={layoutOptions?.hideTryIt}
-        tryItCredentialsPolicy={tryItCredentialsPolicy}
-        mockUrl={mocking.hideMocking ? undefined : mocking.mockUrl}
-        corsProxy={tryItCorsProxy}
-      />
-    );
-
-    return (
-      <TwoColumnLayout
-        className={cn('HttpOperation', className)}
-        header={header}
-        left={description}
-        right={tryItPanel}
-      />
     );
   },
 );
