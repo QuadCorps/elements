@@ -21,6 +21,23 @@ export const formatMultiValueHeader = (...keyValuePairs: ReadonlyArray<readonly 
     .join(', ');
 };
 
+export const formatKongHeader = (...keyValuePairs: ReadonlyArray<readonly [string, string] | string>) => {
+  // right now we are assuming that key is a valid token. We might want to implement parsing later.
+  // *token* is defined in RFC 7230, section 3.2.6.
+  return keyValuePairs
+    .map(item => {
+      if (typeof item === 'string') return item;
+
+      const [key, rawValue] = item;
+      if (!rawValue) return key;
+
+      const needsQuotes = rawValue.indexOf(',') > -1;
+      const value = needsQuotes ? `"${rawValue}"` : rawValue;
+      return `${value}`;
+    })
+    .join(', ');
+};
+
 // Copied from https://en.wikipedia.org/wiki/List_of_HTTP_header_fields
 export const allHeaderFields: ParamField[] = [
   {
@@ -159,6 +176,11 @@ export const allHeaderFields: ParamField[] = [
     name: 'If-Unmodified-Since',
     description: 'Only send the response if the entity has not been modified since a specific time.',
     example: 'If-Unmodified-Since: Sat, 29 Oct 1994 19:43:31 GMT',
+  },
+  {
+    name: 'X-Kong-Mocking-Status-Cod',
+    description: 'Mock header used by Kong Gateway Mock plugin to set the status code to respond to.',
+    example: 'X-Kong-Mocking-Status-Cod: 200',
   },
   {
     name: 'Max-Forwards',

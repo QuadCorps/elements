@@ -254,7 +254,7 @@ export async function buildHarRequest({
     [];
 
   if (mockData?.header) {
-    headerParams.push({ name: 'Prefer', value: mockData.header.Prefer });
+    headerParams.push({ name: 'X-Kong-Mocking-Status-Code', value: mockData.header['X-Kong-Mocking-Status-Code'] });
   }
 
   if (shouldIncludeBody) {

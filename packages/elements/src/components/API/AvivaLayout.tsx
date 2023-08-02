@@ -24,6 +24,7 @@ type SidebarLayoutProps = {
   exportProps?: ExportButtonProps;
   tryItCredentialsPolicy?: 'omit' | 'include' | 'same-origin';
   tryItCorsProxy?: string;
+  mockUrl?: string;
 };
 
 export const AvivaLayout: React.FC<SidebarLayoutProps> = ({
@@ -36,6 +37,7 @@ export const AvivaLayout: React.FC<SidebarLayoutProps> = ({
   exportProps,
   tryItCredentialsPolicy,
   tryItCorsProxy,
+  mockUrl,
 }) => {
   const container = React.useRef<HTMLDivElement>(null);
   const tree = React.useMemo(
@@ -101,6 +103,7 @@ export const AvivaLayout: React.FC<SidebarLayoutProps> = ({
           exportProps={exportProps}
           tryItCredentialsPolicy={tryItCredentialsPolicy}
           tryItCorsProxy={tryItCorsProxy}
+          mockUrl={mockUrl}
         />
       )}
     </SidebarLayout>

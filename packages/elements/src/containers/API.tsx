@@ -88,6 +88,12 @@ export interface CommonAPIProps extends RoutingProps {
    * @default false
    */
   tryItCorsProxy?: string;
+
+  /**
+   *
+   * @default false
+   */
+  mockUrl?: string;
 }
 
 const propsAreWithDocument = (props: APIProps): props is APIPropsWithDocument => {
@@ -105,6 +111,7 @@ export const APIImpl: React.FC<APIProps> = props => {
     hideExport,
     tryItCredentialsPolicy,
     tryItCorsProxy,
+    mockUrl,
   } = props;
   const apiDescriptionDocument = propsAreWithDocument(props) ? props.apiDescriptionDocument : undefined;
 
@@ -181,6 +188,7 @@ export const APIImpl: React.FC<APIProps> = props => {
           exportProps={exportProps}
           tryItCredentialsPolicy={tryItCredentialsPolicy}
           tryItCorsProxy={tryItCorsProxy}
+          mockUrl={mockUrl}
         />
       )}
     </InlineRefResolverProvider>

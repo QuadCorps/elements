@@ -115,6 +115,8 @@ interface BaseDocsProps {
     compact?: number | boolean;
   };
 
+  mockUrl?: string;
+
   nodeHasChanged?: NodeHasChangedFn<React.ReactNode>;
 }
 

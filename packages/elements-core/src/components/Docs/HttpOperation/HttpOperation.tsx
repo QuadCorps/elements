@@ -7,7 +7,6 @@ import { useAtomValue } from 'jotai/utils';
 import * as React from 'react';
 
 import { HttpMethodColors } from '../../../constants';
-import { MockingContext } from '../../../containers/MockingProvider';
 import { useResolvedObject } from '../../../context/InlineRefResolver';
 import { useOptionsCtx } from '../../../context/Options';
 import { useChosenServerUrl } from '../../../hooks/useChosenServerUrl';
@@ -24,11 +23,9 @@ import { Responses } from './Responses';
 export type HttpOperationProps = DocsComponentProps<IHttpOperation>;
 
 const HttpOperationComponent = React.memo<HttpOperationProps>(
-  ({ className, data: unresolvedData, layoutOptions, tryItCredentialsPolicy, tryItCorsProxy }) => {
+  ({ className, data: unresolvedData, layoutOptions, tryItCredentialsPolicy, tryItCorsProxy, mockUrl }) => {
     const { nodeHasChanged } = useOptionsCtx();
     const data = useResolvedObject(unresolvedData) as IHttpOperation;
-
-    const mocking = React.useContext(MockingContext);
     const isDeprecated = !!data.deprecated;
     const isInternal = !!data.internal;
 
@@ -59,7 +56,7 @@ const HttpOperationComponent = React.memo<HttpOperationProps>(
         <Box>
           <TryIt
             httpOperation={data}
-            mockUrl={mocking.hideMocking ? undefined : mocking.mockUrl}
+            mockUrl={mockUrl}
             requestBodyIndex={requestBodyIndex}
             embeddedInMd={false}
             tryItCredentialsPolicy={tryItCredentialsPolicy}

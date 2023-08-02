@@ -1,14 +1,14 @@
 import { IHttpOperation } from '@stoplight/types';
 import { compact, uniq } from 'lodash';
 
-import { formatMultiValueHeader } from '../../../utils/headers';
+import { formatKongHeader } from '../../../utils/headers';
 
 export type MockingOptions = { code?: string; example?: string; dynamic?: boolean };
 type PreferHeaderProps = { code?: string; example?: string; dynamic?: boolean };
 
 export type MockData = {
   url: string;
-  header?: Record<'Prefer', string>;
+  header?: Record<'X-Kong-Mocking-Status-Code', string>;
 };
 
 export function getMockData(
@@ -22,7 +22,7 @@ export function getMockData(
 export function buildPreferHeader(
   { code, example, dynamic }: PreferHeaderProps,
   httpOperation: IHttpOperation,
-): Record<'Prefer', string> | undefined {
+): Record<'X-Kong-Mocking-Status-Code', string> | undefined {
   if (!code) {
     return undefined;
   }
@@ -34,10 +34,10 @@ export function buildPreferHeader(
     dynamic ? ['dynamic', String(dynamic)] : undefined,
     example && isExampleSupported ? ['example', example] : undefined,
   ]);
-  const headerValue = formatMultiValueHeader(...args);
+  const headerValue = formatKongHeader(...args);
 
   return {
-    Prefer: headerValue,
+    'X-Kong-Mocking-Status-Code': headerValue,
   };
 }
 
